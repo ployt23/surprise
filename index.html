@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday, My Everything</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lora:ital,wght@0,400;1,400&family=Montserrat:wght@300&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- GLOBAL SETTINGS --- */
+        body { margin: 0; padding: 0; font-family: 'Georgia', serif; overflow: hidden; height: 100vh; width: 100vw; background-color: rgba(255, 204, 188, 1); }
+
+        /* --- INTRO SCREEN --- */
+        #intro-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; background-color: rgba(255, 204, 188, 1); display: flex; flex-direction: column; align-items: center; overflow-y: auto; padding: 20px; box-sizing: border-box; justify-content: center; }
+        .intro-content-wrapper { display: flex; justify-content: center; align-items: center; width: 100%; max-width: 1400px; gap: 40px; flex-shrink: 0; }
+        
+        .photo-container { flex: 1; max-width: 400px; min-width: 200px; position: relative; }
+        .photo-container img { width: 100%; height: auto; border-radius: 20px; box-shadow: 0 15px 35px rgba(168, 100, 100, 0.3); transition: transform 0.3s ease; border: 8px solid white; display: block; }
+        .photo-container img:hover { transform: scale(1.03); }
+
+        .intro-text-container { flex: 1.5; padding: 0 20px; color: #8b4513; text-align: center; min-width: 300px; }
+        .highlight { font-size: 1.5rem; font-weight: bold; color: #d32f2f; margin-bottom: 20px; display: block; font-style: italic; }
+        .body-text { font-size: 1.1rem; line-height: 1.8; margin-bottom: 25px; color: #555; }
+        .main-title { font-size: 3rem; font-weight: 800; color: #d32f2f; margin: 15px 0; text-transform: uppercase; text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.6); letter-spacing: 2px; line-height: 1.1; }
+
+        .bubble-wrapper { margin-top: 40px; margin-bottom: 40px; flex-shrink: 0; z-index: 10; }
+        .bubble-btn { width: 140px; height: 140px; background: radial-gradient(circle at 30% 30%, #ff9a9e, #fad0c4); border-radius: 50%; border: none; cursor: pointer; box-shadow: 0 10px 20px rgba(255, 154, 158, 0.5), inset -10px -10px 20px rgba(0,0,0,0.1), inset 10px 10px 20px rgba(255,255,255,0.5); color: white; font-size: 1.2rem; font-weight: bold; font-family: 'Courier New', Courier, monospace; animation: float 3s ease-in-out infinite; transition: transform 0.3s; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+        .bubble-btn:hover { transform: scale(1.1); background: radial-gradient(circle at 30% 30%, #ffafbd, #ffc3a0); }
+
+        .heart-bg { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: -1; }
+        .heart { position: absolute; bottom: -50px; color: rgba(255, 255, 255, 0.7); font-size: 24px; animation: flyUp 8s linear infinite; }
+
+        /* MUSIC PERMISSION OVERLAY */
+        #music-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; }
+        .music-msg-box { background: white; padding: 30px; border-radius: 15px; color: #d32f2f; max-width: 300px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .music-confirm-btn { margin-top: 15px; padding: 10px 25px; background: #d32f2f; color: white; border: none; border-radius: 25px; font-size: 1.1rem; cursor: pointer; font-family: 'Montserrat', sans-serif; }
+
+        /* --- MAIN SCREEN --- */
+        #main-screen { display: none; opacity: 0; height: 100vh; width: 100vw; background-color: #f0f4f8; position: relative; transition: opacity 1.5s ease; font-family: 'Courier New', Courier, monospace; }
+        
+        .page { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; overflow-y: auto; }
+        
+        /* THE FIX: Only when class 'active' is added do we display flex */
+        .active { display: flex !important; animation: fadeInPage 1s ease; }
+
+        #menu-page { background-color: rgba(255, 204, 188, 1); }
+        
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 800px; }
+        .envelope-wrapper { text-align: center; cursor: pointer; transition: transform 0.2s; }
+        .envelope-wrapper:hover { transform: scale(1.05); }
+        .envelope { width: 200px; height: 140px; background-color: #d32f2f; position: relative; margin: 0 auto 10px auto; border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .envelope::before { content: ''; position: absolute; top: 0; left: 0; border-left: 100px solid transparent; border-right: 100px solid transparent; border-top: 70px solid #ef5350; }
+        .seal { width: 30px; height: 30px; background: #f5f5f5; border-radius: 50%; position: absolute; top: 50px; left: 50%; transform: translateX(-50%); border: 2px solid #ddd; }
+        .label { font-size: 1.2rem; color: #333; text-decoration: underline; font-weight: bold; }
+
+        .back-btn { margin-top: 30px; padding: 12px 30px; background: #fff; border: 2px solid #333; cursor: pointer; font-weight: bold; box-shadow: 4px 4px 0 #333; transition: 0.1s; position: relative; z-index: 10; }
+        .back-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #333; }
+
+        img.letter-img { max-width: 100%; max-height: 400px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-top: 10px; }
+        .garden-title { font-family: 'Great Vibes', cursive; font-size: 3.5rem; color: #b76e79; margin-bottom: 15px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); text-align: center; }
+        .garden-text { font-family: 'Lora', serif; font-size: 1.1rem; color: #4a4a4a; line-height: 1.8; max-width: 700px; text-align: center; margin-bottom: 10px; }
+        .water-btn { margin-top: 10px; margin-bottom: 20px; padding: 10px 25px; background-color: #ffccbc; border: 2px solid #ffab91; border-radius: 25px; color: #d84315; font-family: 'Montserrat', sans-serif; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.3s ease; }
+        .water-btn:hover { background-color: #ffab91; color: white; transform: scale(1.05); }
+        .sticker-heart { position: absolute; opacity: 0.9; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3)); }
+
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes flyUp { 0% { transform: translateY(100vh) scale(0.5); opacity: 0; } 50% { opacity: 0.8; } 100% { transform: translateY(-10vh) scale(1.2); opacity: 0; } }
+        @keyframes fadeInPage { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (max-width: 1000px) {
+            #intro-screen { justify-content: flex-start; padding-top: 40px; }
+            .intro-content-wrapper { flex-direction: column; gap: 25px; width: 100%; }
+            .intro-text-container { order: 2; min-width: auto; padding: 0 10px; }
+            .main-title { font-size: 2.2rem; }
+            .highlight { font-size: 1.2rem; }
+            .body-text { font-size: 1rem; }
+            .photo-container { max-width: 280px; width: 80%; }
+            .photo-container:nth-child(1) { order: 1; }
+            .intro-text-container { order: 2; }
+            .photo-container:nth-child(3) { order: 3; }
+            .bubble-wrapper { margin-top: 30px; }
+            .grid-container { gap: 20px; }
+            .envelope { width: 150px; height: 105px; }
+            .envelope::before { border-left-width: 75px; border-right-width: 75px; border-top-width: 52px; }
+            .seal { top: 40px; }
+            .garden-title { font-size: 2.5rem; }
+            .garden-text { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop>
+        <source src="birthday.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="music-overlay">
+        <div class="music-msg-box">
+            <h2>🎵 Special Song 🎵</h2>
+            <p>I have a song dedicated to you.<br>Tap below to play it.</p>
+            <button class="music-confirm-btn" onclick="enableAudio()">Play Music & Start ❤️</button>
+        </div>
+    </div>
+
+    <div id="intro-screen">
+        <div class="heart-bg" id="heart-bg"></div>
+        <div class="intro-content-wrapper">
+            <div class="photo-container"><img src="couple.jpeg" alt="Couple Photo"></div>
+            <div class="intro-text-container">
+                <span class="highlight">To the woman who carries the sun in her smile.</span>
+                <p class="body-text">Today isn't just a date on a calendar; it is a celebration of the day the world became a more beautiful place because you arrived. This space is a small tribute to the person who has become my entire world.</p>
+                <h1 class="main-title">Happy Birthday,<br>My Everything.</h1>
+                <p class="body-text" style="font-weight:bold; font-style:italic;">I’ve loved you for a thousand days, and I’ll love you for a thousand more.</p>
+            </div>
+            <div class="photo-container"><img src="girl.jpeg" alt="Girl Photo"></div>
+        </div>
+        <div class="bubble-wrapper">
+            <button class="bubble-btn" onclick="startExperience()">SURPRISE<br>✨<br><span style="font-size:0.8rem; font-weight:normal;">click me</span></button>
+        </div>
+    </div>
+
+    <div id="main-screen">
+        
+        <div id="menu-page" class="page active">
+            <h2 style="margin-bottom:40px; color:#555; font-size: 2rem;">Don't Blush, Open it LOVE💖</h2>
+            <div class="grid-container">
+                <div class="envelope-wrapper" onclick="openLetter('letter1')"><div class="envelope"><div class="seal"></div></div><div class="label">Letter 1</div></div>
+                <div class="envelope-wrapper" onclick="openLetter('letter2')"><div class="envelope"><div class="seal"></div></div><div class="label">Letter 2</div></div>
+                <div class="envelope-wrapper" onclick="openLetter('letter3')"><div class="envelope"><div class="seal"></div></div><div class="label">Letter 3</div></div>
+                <div class="envelope-wrapper" onclick="openLetter('letter4')"><div class="envelope"><div class="seal"></div></div><div class="label">Letter 4</div></div>
+            </div>
+        </div>
+
+        <div id="letter1" class="page" style="background: #ffffff; background-color: rgba(255, 204, 188, 1);">
+            <h1 class="garden-title">A Garden of My Love</h1>
+            <p class="garden-text">
+                I wanted to give you flowers that never wither, just like my feelings for you. Each bloom in this virtual bouquet represents a moment you’ve brought light into my life—the roses for your passion, the lilies for your grace, and the wildflowers for your beautiful, untamed spirit. 
+                <br><br>
+                Even though these are digital, the promise behind them is real: I promise to keep choosing you, to keep admiring you, and to keep planting seeds of joy in our life together. You are the most beautiful thing that has ever grown in my world. Happy Birthday, my love.
+            </p>
+           
+            <img src="boquet.jpeg" class="letter-img" alt="Virtual Bouquet">
+            <button class="back-btn" onclick="goBack()">BACK</button>
+        </div>
+
+        <div id="letter2" class="page" style="
+            background-image: url('photo.jpeg'); 
+            background-size: contain; 
+            background-repeat: no-repeat; 
+            background-position: center; 
+            background-color: rgba(255, 204, 188, 1); 
+            justify-content: flex-end; 
+            padding-bottom: 50px;">
+            <img src="heart1.jpeg" class="sticker-heart" style="top: 30px; left: 30px; width: 150px; transform: rotate(-15deg);">
+            <img src="heart2.jpeg" class="sticker-heart" style="top: 40%; right: 20px; width: 180px; transform: rotate(10deg);">
+            <button class="back-btn" onclick="goBack()">BACK</button>
+        </div>
+
+        <div id="letter3" class="page" style="padding: 20px; background: black; flex-direction: column; justify-content: center; align-items: center;">
+            <h1 style="color: white; font-family: 'Courier New'; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); margin-bottom: 20px; text-align: center;">I PURPLE YOU ❤️🫂💋✨</h1>
+            <video id="letter3-video" controls autoplay loop playsinline 
+                   style="width: 90%; max-width: 600px; max-height: 60vh; border-radius: 10px; box-shadow: 0 0 20px rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2);">
+                <source src="our-video.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <button class="back-btn" onclick="goBack()" style="margin-top: 30px;">BACK</button>
+        </div>
+
+        <div id="letter4" class="page" style="background-color: rgba(255, 204, 188, 1);">
+            <img src="letter4.png" style="width: auto; height: auto; max-width: 90vw; max-height: 75vh; border-radius: 15px; border: 5px solid white; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+            <button class="back-btn" onclick="goBack()">BACK</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 1. GLOBAL VARIABLES ---
+        const heartContainer = document.getElementById('heart-bg');
+        const symbols = ['♥', '💖', '✨', '🌸'];
+        const bgMusic = document.getElementById('bg-music');
+        const musicOverlay = document.getElementById('music-overlay');
+
+        // --- 2. MUSIC AUTO-START LOGIC ---
+        // Try to play immediately on load
+        window.addEventListener('load', () => {
+            bgMusic.play().catch(error => {
+                console.log("Autoplay blocked. Showing permission overlay.");
+                musicOverlay.style.display = 'flex';
+            });
+        });
+
+        // User clicks the button in the overlay
+        function enableAudio() {
+            bgMusic.play();
+            musicOverlay.style.display = 'none';
+        }
+
+        // --- 3. ANIMATIONS ---
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
+            heartContainer.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, 8000);
+        }
+        setInterval(createHeart, 400);
+
+        function waterHeart() {
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.classList.add('heart');
+                    const flowerSymbols = ['🌸', '🌹', '💖', '💐', '🌺'];
+                    heart.innerText = flowerSymbols[Math.floor(Math.random() * flowerSymbols.length)];
+                    heart.style.left = (Math.random() * 100) + 'vw'; 
+                    heart.style.bottom = '0px';
+                    heart.style.zIndex = '9999';
+                    heart.style.animation = "flyUp 4s linear"; 
+                    heart.style.fontSize = (Math.random() * 30 + 20) + 'px';
+                    document.body.appendChild(heart);
+                    setTimeout(() => { heart.remove(); }, 4000);
+                }, i * 100);
+            }
+        }
+
+        // --- 4. NAVIGATION LOGIC (FIXED) ---
+        function startExperience() {
+            // A. VISUALS FIRST (Guarantees navigation works even if audio fails)
+            const intro = document.getElementById('intro-screen');
+            const main = document.getElementById('main-screen');
+            
+            intro.style.opacity = '0';
+            setTimeout(() => {
+                intro.style.display = 'none';
+                main.style.display = 'block';
+                setTimeout(() => { main.style.opacity = '1'; }, 50);
+            }, 1500);
+
+            // B. AUDIO SECOND (Safely stop the music)
+            try {
+                if (bgMusic) {
+                    bgMusic.pause();
+                    bgMusic.currentTime = 0;
+                }
+            } catch (e) {
+                console.log("Audio stop error ignored");
+            }
+        }
+
+        function openLetter(id) {
+            document.getElementById('menu-page').classList.remove('active');
+            document.getElementById(id).classList.add('active');
+            
+            // Video Play Logic for Letter 3
+            if (id === 'letter3') {
+                const vid = document.getElementById('letter3-video');
+                if(vid) {
+                    vid.currentTime = 0;
+                    vid.play().catch(e => console.log("Video Autoplay blocked"));
+                }
+            }
+        }
+
+        function goBack() {
+            // Pause video if coming back from Letter 3
+            const vid = document.getElementById('letter3-video');
+            if (vid) { vid.pause(); }
+
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('menu-page').classList.add('active');
+        }
+    </script>
+</body>
+</html>
